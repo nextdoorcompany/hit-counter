@@ -32,9 +32,12 @@ void setup() {
   Serial.println("7 Segment Backpack Test");
 #endif
   matrix.begin(0x70);
+  printDecimal(500);
 }
 
 void loop() {
+  /*
+  matrix.print(1234, DEC);
   // try to print a number thats too long
   matrix.print(10000, DEC);
   matrix.writeDisplay();
@@ -76,6 +79,10 @@ void loop() {
       blinkcounter = 0;
     }
     matrix.writeDisplay();
-    delay(10);
+    delay(10); */
   }
-}
+
+  void printDecimal(int val) {
+    matrix.print(val, DEC);
+    matrix.writeDisplay();
+  }
