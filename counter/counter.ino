@@ -25,17 +25,41 @@
 #include "Adafruit_LEDBackpack.h"
 
 Adafruit_7segment matrix = Adafruit_7segment();
+const int resetPin = 7;    // the number of the pushbutton pin
+const int resetDelay = 1000;
+const int counterPin = 4;
+const int counterDelay = 500;
+
+int count;
 
 void setup() {
 #ifndef __AVR_ATtiny85__
   Serial.begin(9600);
   Serial.println("7 Segment Backpack Test");
 #endif
+  pinMode(resetPin, INPUT_PULLUP);
+  pinMode(counterPin, INPUT_PULLUP);
   matrix.begin(0x70);
-  printDecimal(500);
+  count = 0;
+  printDecimal(count);
 }
 
 void loop() {
+  int resetReading = digitalRead(resetPin);
+  if (resetReading == LOW) {
+    count = 0;
+    printDecimal(count);
+    delay(resetDelay);
+    Serial.println("reset button after delay");
+  }
+
+  int counterReading = digitalRead(counterPin);
+  if (counterReading == LOW) {
+    count++;
+    printDecimal(count);
+    delay(counterDelay);
+    Serial.println("count button after delay");
+  }
   /*
   matrix.print(1234, DEC);
   // try to print a number thats too long
