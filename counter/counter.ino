@@ -23,12 +23,14 @@
 #include <Wire.h> // Enable this line if using Arduino Uno, Mega, etc.
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
+#include <EEPROM.h>
 
 Adafruit_7segment matrix = Adafruit_7segment();
 const int resetPin = 7;    // the number of the pushbutton pin
 const int resetDelay = 1000;
 const int counterPin = 4;
 const int counterDelay = 500;
+const int eeAddress = 0;
 
 int count;
 
@@ -40,15 +42,24 @@ void setup() {
   pinMode(resetPin, INPUT_PULLUP);
   pinMode(counterPin, INPUT_PULLUP);
   matrix.begin(0x70);
-  count = 0;
+  Serial.print("Read float from xEEPROM: ");
+
+  //Get the float data from the EEPROM at position 'eeAddress'
+  EEPROM.get(eeAddress, count);
+  if (count < 0) {
+    count = 0;
+  }
+  Serial.println(count, DEC);    //This may print 'ovf, nan' if the data inside the EEPROM is not a valid float.
   printDecimal(count);
+
+
 }
 
 void loop() {
   int resetReading = digitalRead(resetPin);
   if (resetReading == LOW) {
     count = 0;
-    printDecimal(count);
+    stateChange(count);
     delay(resetDelay);
     Serial.println("reset button after delay");
   }
@@ -56,10 +67,13 @@ void loop() {
   int counterReading = digitalRead(counterPin);
   if (counterReading == LOW) {
     count++;
-    printDecimal(count);
+    stateChange(count);
     delay(counterDelay);
     Serial.println("count button after delay");
   }
+
+
+
   /*
   matrix.print(1234, DEC);
   // try to print a number thats too long
@@ -104,6 +118,11 @@ void loop() {
     }
     matrix.writeDisplay();
     delay(10); */
+  }
+
+  void stateChange(int count) {
+    printDecimal(count);
+    EEPROM.put(eeAddress, count);
   }
 
   void printDecimal(int val) {
