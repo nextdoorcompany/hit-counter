@@ -10,6 +10,9 @@ const int counterPin = 4;
 const int counterDelay = 500;
 const int eeAddress = 0;
 
+/* set this line for # of hits between change */
+const int multi = 3;
+
 int count;
 
 void setup() {
@@ -41,7 +44,7 @@ void loop() {
   int counterReading = digitalRead(counterPin);
   if (counterReading == LOW) {
     count++;
-    stateChange(count);
+    stateChange(count / multi);
     delay(counterDelay);
     Serial.println("count button after delay");
   }
